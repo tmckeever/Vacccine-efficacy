@@ -2,9 +2,9 @@
 # Import functions
 
 from cohortextractor import (
-    StudyDefinition, 
-    patients, 
-    codelist, 
+    StudyDefinition,
+    patients,
+    codelist,
     codelist_from_csv
 )
 
@@ -16,13 +16,47 @@ chronic_cardiac_disease_codes = codelist_from_csv(
 chronic_liver_disease_codes = codelist_from_csv(
     "codelists/opensafely-chronic-liver-disease.csv", system="ctv3", column="CTV3ID"
 )
-salbutamol_codes = codelist_from_csv(
-    "codelists/opensafely-asthma-inhaler-salbutamol-medication.csv",
-    system="snomed",
-    column="id",
+chronic_kidney_disease_codes = codelist_from_csv(
+    "codelists/opensafely-chronic_kidney_disease_codescsv", system="ctv3", column="CTV3ID"
 )
-systolic_blood_pressure_codes = codelist(["2469."], system="ctv3")
-diastolic_blood_pressure_codes = codelist(["246A."], system="ctv3")
+hypertension_codes = codelist_from_csv(
+    "codelists/opensafely-hypertension_codes.csv", system="ctv3", column="CTV3ID"
+)
+chronic_diabetes_codes = codelist_from_csv(
+    "codelists/opensafely-chronic_diabetes_codes.csv", system="ctv3", column="CTV3ID"
+)
+chronic_respiratory_disease_disease_codes = codelist_from_csv(
+    "codelists/opensafely-chronic-respiratory_disease_codes.csv", system="ctv3", column="CTV3ID"
+)
+solid_organ_transplantation_codes = codelist_from_csv(
+    "codelists/opensafely-solid-organ-transplantation-codes.csv", system="ctv3", column="CTV3ID"
+)
+stroke_codes = codelist_from_csv(
+    "codelists/opensafely-stroke-codes.csv", system="ctv3", column="CTV3ID"
+)
+cancer-excluding-lung-and-haemotological = codelist_from_csv(
+    "codelists/opensafely-cancer-excluding-lung-and-haemotological.csv", system="ctv3", column="CTV3ID"
+)
+
+cancer-haemotological-cancer = codelist_from_csv(
+    "codelists/opensafely-haemotological-cancer.csv", system="ctv3", column="CTV3ID"
+)
+dementia= codelist_from_csv(
+    "codelists/opensafely-dementia-complete-48c76cf8.csv", system="ctv3", column="CTV3ID"
+)
+
+
+
+Lung cancer
+Smoking ethnicity
+IMD
+bmi
+flu vaccine
+
+COIVD test
+location
+consultating rate
+
 
 
 # Specifiy study defeinition
@@ -35,18 +69,20 @@ study = StudyDefinition(
     },
     # This line defines the study population
     population=patients.registered_with_one_practice_between(
-        "2019-02-01", "2020-02-01"
+        "2019-02-01", "2021-02-01"
     ),
 
     # https://github.com/opensafely/risk-factors-research/issues/49
     age=patients.age_as_of(
-        "2020-02-01",
+        "2021-03-01",
         return_expectations={
             "rate": "universal",
             "int": {"distribution": "population_ages"},
         },
     ),
-    
+
+
+
     # https://github.com/opensafely/risk-factors-research/issues/46
     sex=patients.sex(
         return_expectations={
@@ -54,7 +90,7 @@ study = StudyDefinition(
             "category": {"ratios": {"M": 0.49, "F": 0.51}},
         }
     ),
-    
+
     # https://codelists.opensafely.org/codelist/opensafely/chronic-cardiac-disease/2020-04-08/
     chronic_cardiac_disease=patients.with_these_clinical_events(
         chronic_cardiac_disease_codes,
@@ -100,7 +136,7 @@ study = StudyDefinition(
             "float": {"distribution": "normal", "mean": 80, "stddev": 10},
         },
     ),
-    
+
     # https://github.com/opensafely/risk-factors-research/issues/48
     bp_dias=patients.mean_recorded_value(
         diastolic_blood_pressure_codes,
@@ -123,7 +159,7 @@ study = StudyDefinition(
             "category": {"ratios": {"STP1": 0.5, "STP2": 0.5}},
         },
     ),
-    
+
     # https://github.com/opensafely/risk-factors-research/issues/44
     msoa=patients.registered_practice_as_of(
         "2020-02-01",
@@ -154,7 +190,7 @@ study = StudyDefinition(
             "category": {"ratios": {"rural": 0.1, "urban": 0.9}},
         },
     ),
- 
+
     # https://codelists.opensafely.org/codelist/opensafely/asthma-inhaler-salbutamol-medication/2020-04-15/
     recent_salbutamol_count=patients.with_these_medications(
         salbutamol_codes,
